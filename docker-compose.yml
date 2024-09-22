@@ -1,0 +1,39 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: phonebook_user
+      POSTGRES_PASSWORD: phonebook_password
+      POSTGRES_DB: phonebook_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - phonebook-network
+
+  node:
+    build: .
+    container_name: phonebook_api
+    command: npm run dev
+    environment:
+      DB_HOST: postgres
+      DB_USER: phonebook_user
+      DB_PASSWORD: phonebook_password
+      DB_NAME: phonebook_db
+      DB_PORT: 5432
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    networks:
+      - phonebook-network
+
+volumes:
+  pgdata:
+
+networks:
+  phonebook-network:
+    driver: bridge
